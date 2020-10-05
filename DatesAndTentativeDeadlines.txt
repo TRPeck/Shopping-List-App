@@ -1,0 +1,7 @@
+Meeting Every Saturday @ 9PM for Discussion and Code Review
+October 10 2020 - Market and User Rearch Submitted. Design of UI Agreed Upon
+November 1 2020 - Main Activity/List and Search Fragments in Working Order
+November 10 2020 - UI Finalized
+November 15 2020 - All Basic Functionality Implemented and Integrated - Ready to Submit
+November 25 2020 - Deadline for All Supplemental Features
+December 7-13 2020 - Final Week of Semester
