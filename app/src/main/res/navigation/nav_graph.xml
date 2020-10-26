@@ -12,9 +12,9 @@
         tools:layout="@layout/fragment_edit_list" />
     <fragment
         android:id="@+id/ListViewFragment"
-        android:name="com.example.shoppinglist.ListViewFragment"
+        android:name="com.example.shoppinglist.ListsViewFragment"
         android:label="@string/first_fragment_label"
-        tools:layout="@layout/fragment_list_view">
+        tools:layout="@layout/fragment_lists_view">
 
 
     </fragment>
