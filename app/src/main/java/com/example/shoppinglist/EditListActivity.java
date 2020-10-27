@@ -10,13 +10,17 @@ import androidx.appcompat.widget.Toolbar;
 
 import android.view.View;
 
-public class SearchActivity extends AppCompatActivity {
-    // activity that is required to implement the android search dialog
+public class EditListActivity extends AppCompatActivity {
+    // activity where the user will be able to edit their lists and add new items
+    // opens the search
+
+    // todo: create adapter for recyclerview. code selecting items, removing items, database connectivity
+    // todo: add onSearchRequested that is called by addItems to activate SearchActivity
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_search);
+        setContentView(R.layout.activity_edit_list);
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
