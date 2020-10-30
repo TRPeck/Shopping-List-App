@@ -10,13 +10,17 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
         <activity
+            android:name=".ListsViewActivity"
+            android:label="@string/title_activity_lists_view"
+            android:theme="@style/AppTheme.NoActionBar"></activity>
+        <activity
             android:name=".EditListActivity"
             android:label="@string/title_activity_edit_list"
             android:theme="@style/AppTheme.NoActionBar">
-            <meta-data android:name="android.app.default_searchable"
-                       android:value=".SearchActivity"/>
-        </activity>
-        <!-- this activity performs searches. it will be activated by the edit list activity -->
+            <meta-data
+                android:name="android.app.default_searchable"
+                android:value=".SearchActivity" />
+        </activity> <!-- this activity performs searches. it will be activated by the edit list activity -->
         <activity
             android:name=".SearchActivity"
             android:label="@string/title_activity_search"
