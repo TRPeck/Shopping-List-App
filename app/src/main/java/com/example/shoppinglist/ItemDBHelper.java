@@ -1,31 +1,33 @@
 package com.example.shoppinglist;
 
 import android.content.Context;
+import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
-import com.example.shoppinglist.ItemContract.*;
 
-import androidx.annotation.Nullable;
+import java.util.ArrayList;
+import java.util.List;
 
 public class ItemDBHelper extends SQLiteOpenHelper {
-    // this is a helper class to create and update database
 
-    // todo: add database name
-    public static final String DATABASE_NAME = "";
-    public static final int DATABASE_VERSION = 1;
+    private static String dbName = "";
+    private static int dbVersion = 1;
 
-    public ItemDBHelper(@Nullable Context context) {
-        super(context, DATABASE_NAME, null, DATABASE_VERSION);
+    private static String itemTable = "item";
+
+    private static String nameColumn = "name";
+    private static String aisleColumn = "aisle";
+
+    public ItemDBHelper(Context context){
+        super(context, dbName, null, dbVersion);
     }
 
     @Override
     public void onCreate(SQLiteDatabase db) {
-        // todo: update with proper table name and column name and units
         final String SQL_CREATE_ITEM_TABLE = "CREATE TABLE " +
-                ItemEntry.TABLE_NAME + " (" +
-                ItemEntry._ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
-                ItemEntry.COLUMN_NAME + " TEXT NOT NULL, " +
-                ItemEntry.COLUMN_AISLE + " INTEGER NOT NULL" +
+                itemTable + " (" +
+                nameColumn + " TEXT NOT NULL, " +
+                aisleColumn + " INTEGER NOT NULL" +
                 ");";
 
         db.execSQL(SQL_CREATE_ITEM_TABLE);
@@ -33,7 +35,47 @@ public class ItemDBHelper extends SQLiteOpenHelper {
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-        db.execSQL("DROP TABLE IF EXISTS " + ItemEntry.TABLE_NAME);
+        db.execSQL("DROP TABLE IF EXISTS " + itemTable);
         onCreate(db);
+    }
+
+    public List<Item> findAll(){
+        List<Item> items = null;
+        try{
+            SQLiteDatabase sqLiteDatabase = getReadableDatabase();
+            Cursor cursor = sqLiteDatabase.rawQuery("SELECT * FROM " + itemTable, null);
+            if(cursor.moveToFirst()){
+                items = new ArrayList<Item>();
+                do{
+                    Item item = new Item();
+                    item.setName(cursor.getString(0));
+                    item.setAisle(1);
+                    items.add(item);
+                } while(cursor.moveToNext());
+            }
+        } catch(Exception e){
+            items = null;
+        }
+        return items;
+    }
+
+    public List<Item> search(String keyword){
+        List<Item> items = null;
+        try{
+            SQLiteDatabase sqLiteDatabase = getReadableDatabase();
+            Cursor cursor = sqLiteDatabase.rawQuery("SELECT * FROM " + itemTable + " WHERE " + nameColumn + " LIKE ?", new String[] {"%" + keyword + "%"});
+            if(cursor.moveToFirst()){
+                items = new ArrayList<Item>();
+                do{
+                    Item item = new Item();
+                    item.setName(cursor.getString(0));
+                    item.setAisle(1);
+                    items.add(item);
+                } while(cursor.moveToNext());
+            }
+        } catch(Exception e){
+            items = null;
+        }
+        return items;
     }
 }

@@ -30,21 +30,15 @@
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value=".ListsViewActivity" />
-            <meta-data
-                android:name="android.app.default_searchable"
-                android:value=".SearchActivity" />
         </activity> <!-- this activity performs searches. it will be activated by the edit list activity -->
         <activity
             android:name=".SearchActivity"
             android:label="@string/title_activity_search"
+            android:parentActivityName=".EditListActivity"
             android:theme="@style/AppTheme.NoActionBar">
-            <intent-filter>
-                <action android:name="android.intent.action.SEARCH" />
-            </intent-filter>
-
             <meta-data
-                android:name="android.app.searchable"
-                android:resource="@xml/searchable" />
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".EditListActivity"/>
         </activity>
         <activity
             android:name=".MainActivity"
