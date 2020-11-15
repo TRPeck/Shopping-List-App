@@ -1,37 +1,30 @@
 package com.example.shoppinglist;
 
+import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
+import com.readystatesoftware.sqliteasset.SQLiteAssetHelper;
+
 import java.util.ArrayList;
 import java.util.List;
 
-public class ItemDBHelper extends SQLiteOpenHelper {
+public class ItemDBHelper extends SQLiteAssetHelper {
 
-    private static String dbName = "";
-    private static int dbVersion = 1;
+    private static final String dbName = "itemdb.db";
+    private static final int dbVersion = 1;
 
-    private static String itemTable = "item";
-
-    private static String nameColumn = "name";
+    private static String itemTable = "SHOPPINGLISTAPP";
+    private static String _ID = "item_id";
+    private static String nameColumn = "item";
     private static String aisleColumn = "aisle";
 
     public ItemDBHelper(Context context){
         super(context, dbName, null, dbVersion);
     }
 
-    @Override
-    public void onCreate(SQLiteDatabase db) {
-        final String SQL_CREATE_ITEM_TABLE = "CREATE TABLE " +
-                itemTable + " (" +
-                nameColumn + " TEXT NOT NULL, " +
-                aisleColumn + " INTEGER NOT NULL" +
-                ");";
-
-        db.execSQL(SQL_CREATE_ITEM_TABLE);
-    }
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
@@ -39,8 +32,22 @@ public class ItemDBHelper extends SQLiteOpenHelper {
         onCreate(db);
     }
 
-    public List<Item> findAll(){
-        List<Item> items = null;
+    public boolean insert(String name, int aisle){
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues contentValues = new ContentValues();
+        contentValues.put(nameColumn, name);
+        contentValues.put(aisleColumn, aisle);
+        long result = db.insert(itemTable, null, contentValues);
+        if(result == -1){
+            return false;
+        }
+        else{
+            return true;
+        }
+    }
+
+    public ArrayList<Item> findAll(){
+        ArrayList<Item> items = null;
         try{
             SQLiteDatabase sqLiteDatabase = getReadableDatabase();
             Cursor cursor = sqLiteDatabase.rawQuery("SELECT * FROM " + itemTable, null);
@@ -48,7 +55,7 @@ public class ItemDBHelper extends SQLiteOpenHelper {
                 items = new ArrayList<Item>();
                 do{
                     Item item = new Item();
-                    item.setName(cursor.getString(0));
+                    item.setName(cursor.getString(1));
                     item.setAisle(1);
                     items.add(item);
                 } while(cursor.moveToNext());
@@ -59,8 +66,8 @@ public class ItemDBHelper extends SQLiteOpenHelper {
         return items;
     }
 
-    public List<Item> search(String keyword){
-        List<Item> items = null;
+    public ArrayList<Item> search(String keyword){
+        ArrayList<Item> items = null;
         try{
             SQLiteDatabase sqLiteDatabase = getReadableDatabase();
             Cursor cursor = sqLiteDatabase.rawQuery("SELECT * FROM " + itemTable + " WHERE " + nameColumn + " LIKE ?", new String[] {"%" + keyword + "%"});
@@ -68,7 +75,7 @@ public class ItemDBHelper extends SQLiteOpenHelper {
                 items = new ArrayList<Item>();
                 do{
                     Item item = new Item();
-                    item.setName(cursor.getString(0));
+                    item.setName(cursor.getString(1));
                     item.setAisle(1);
                     items.add(item);
                 } while(cursor.moveToNext());

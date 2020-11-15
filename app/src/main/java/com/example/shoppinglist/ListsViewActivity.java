@@ -11,6 +11,10 @@ import android.view.View;
 
 public class ListsViewActivity extends AppCompatActivity {
 
+    private static ListDBHelper listDBHelper;
+    private long listCount = 1;
+    private static long activeList;
+    private static String activeListName;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -19,9 +23,27 @@ public class ListsViewActivity extends AppCompatActivity {
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
+        listDBHelper = new ListDBHelper(getApplicationContext());
+    }
+
+    public static ListDBHelper getListDBHelper(){
+        return listDBHelper;
+    }
+
+    public static long getActiveList(){
+        return activeList;
+    }
+
+    public static String getActiveListName(){
+        return activeListName;
     }
 
     public void newList(View view) {
+        ShoppingList list = new ShoppingList("Untitled List " + listCount);
+        activeListName = list.getListName();
+        listCount++;
+        long list_id = listDBHelper.createList(list);
+        activeList = list_id;
         Intent intent = new Intent(this, EditListActivity.class);
         startActivity(intent);
     }

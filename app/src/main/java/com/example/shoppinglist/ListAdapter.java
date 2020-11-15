@@ -10,24 +10,28 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import java.util.ArrayList;
+
 public class ListAdapter extends RecyclerView.Adapter<ListAdapter.ItemViewHolder> {
 
     private Context mContext;
-    private Cursor mCursor;
+    private ArrayList<Item> mItems;
 
-    public ListAdapter(Context context, Cursor cursor){
+    public ListAdapter(Context context, ArrayList<Item> items){
         mContext = context;
-        mCursor = cursor;
+        mItems = items;
     }
 
     public class ItemViewHolder extends RecyclerView.ViewHolder {
 
         public TextView nameText;
+        public TextView aisleText;
 
         public ItemViewHolder(@NonNull View itemView) {
             super(itemView);
 
-            nameText = itemView.findViewById(R.id.textview_item_name);
+            nameText = itemView.findViewById(R.id.list_item_name);
+            aisleText = itemView.findViewById(R.id.list_item_aisle);
         }
     }
 
@@ -35,34 +39,23 @@ public class ListAdapter extends RecyclerView.Adapter<ListAdapter.ItemViewHolder
     @Override
     public ItemViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         LayoutInflater inflater = LayoutInflater.from(mContext);
-        View view = inflater.inflate(R.layout.store_item, parent, false);
+        View view = inflater.inflate(R.layout.item_in_list, parent, false);
         return new ItemViewHolder(view);
     }
 
     @Override
     public void onBindViewHolder(@NonNull ItemViewHolder holder, int position) {
-        if(!mCursor.move(position)){
-            return;
-        }
+        Item item = mItems.get(position);
+        String itemName = item.getName();
+        int itemAisle = item.getAisle();
 
-        String name = mCursor.getString(mCursor.getColumnIndex(ListContract.ItemEntry.COLUMN_NAME));
-        holder.nameText.setText(name);
+        holder.nameText.setText(itemName);
+        holder.aisleText.setText("Aisle:" + itemAisle);
     }
 
     @Override
     public int getItemCount() {
-        return mCursor.getCount();
+        return mItems.size();
     }
 
-    public void swapCursor(Cursor newCursor){
-        if(mCursor != null){
-            mCursor.close();
-        }
-
-        mCursor = newCursor;
-
-        if(newCursor != null){
-            notifyDataSetChanged();
-        }
-    }
 }

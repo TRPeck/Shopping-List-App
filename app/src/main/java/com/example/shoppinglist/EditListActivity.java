@@ -15,6 +15,13 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.util.ArrayList;
+import java.util.List;
+
 public class EditListActivity extends AppCompatActivity {
     // activity where the user will be able to edit their lists and add new items
     // opens the search
@@ -24,6 +31,11 @@ public class EditListActivity extends AppCompatActivity {
     // database for item list and adapter for displaying it
     private SQLiteDatabase mDatabase;
     private ListAdapter mAdapter;
+    public static JSONArray myList;
+    private RecyclerView recyclerView;
+    private static ArrayList<Item> itemList;
+    private ListAdapter listAdapter;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -35,14 +47,37 @@ public class EditListActivity extends AppCompatActivity {
         ActionBar ab = getSupportActionBar();
         ab.setDisplayHomeAsUpEnabled(true);
 
-        // these are for displaying a list of items gathered from a database
-        ListDBHelper dbHelper = new ListDBHelper(this);
-        mDatabase = dbHelper.getWritableDatabase();
-        RecyclerView recyclerView = findViewById(R.id.listOfItems);
+        recyclerView = findViewById(R.id.listOfItems);
+        recyclerView.setHasFixedSize(true);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
-        mAdapter = new ListAdapter(this, getAllItems());
-        recyclerView.setAdapter(mAdapter);
+
+
+        // these are for displaying a list of items gathered from a database
+        ListDBHelper listDBHelper = ListsViewActivity.getListDBHelper();
+        String activeListName = ListsViewActivity.getActiveListName();
+
+        ArrayList<Item> itemList = listDBHelper.getAllItemsByListName(activeListName);
+
+        if(!itemList.isEmpty()){
+            listAdapter = new ListAdapter(EditListActivity.this, itemList);
+            recyclerView.setAdapter(listAdapter);
+        }
     }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        ListDBHelper listDBHelper = ListsViewActivity.getListDBHelper();
+        String activeListName = ListsViewActivity.getActiveListName();
+
+        ArrayList<Item> itemList = listDBHelper.getAllItemsByListName(activeListName);
+
+        if(!itemList.isEmpty()){
+            listAdapter = new ListAdapter(EditListActivity.this, itemList);
+            recyclerView.setAdapter(listAdapter);
+        }
+    }
+
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -80,17 +115,5 @@ public class EditListActivity extends AppCompatActivity {
         startActivity(intent);
     }
 
-    // method to query database and fill recyclerview
-    private Cursor getAllItems(){
-        return mDatabase.query(
-                ListContract.ItemEntry.TABLE_NAME,
-                null,
-                null,
-                null,
-                null,
-                null,
-                ListContract.ItemEntry.COLUMN_AISLE + " ASC"
-        );
-    }
 
 }
