@@ -1,56 +1,92 @@
-package com.example.shoppinglist;
+package com.example.shoppinglistmaster;
 
+import android.content.DialogInterface;
+import android.content.Intent;
 import android.os.Bundle;
-
-import com.google.android.material.floatingactionbutton.FloatingActionButton;
-import com.google.android.material.snackbar.Snackbar;
-
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.Toolbar;
-
+import android.view.MenuItem;
 import android.view.View;
 
-import android.view.Menu;
-import android.view.MenuItem;
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.recyclerview.widget.ItemTouchHelper;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
-public class MainActivity extends AppCompatActivity {
+import com.example.shoppinglistmaster.adapter.listAdapter;
+import com.example.shoppinglistmaster.database.databaseHandler;
+import com.example.shoppinglistmaster.model.makeListModel;
+import com.example.shoppinglistmaster.model.map;
+import com.google.android.material.bottomnavigation.BottomNavigationView;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+
+public class MainActivity extends AppCompatActivity implements com.example.shoppinglistmaster.DialogCloseListener {
+    private RecyclerView listRecyclerView;
+    private listAdapter listsAdapter;
+    private FloatingActionButton fab;
+    private List<makeListModel> taskList;
+    private databaseHandler db;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        Toolbar toolbar = findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
+        getSupportActionBar().hide();
 
-        FloatingActionButton fab = findViewById(R.id.fab);
+        BottomNavigationView bottomNavigationView = findViewById(R.id.bottom_nav);
+        bottomNavigationView.setSelectedItemId(R.id.dashboard);
+
+        bottomNavigationView.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener() {
+            @Override
+            public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+                switch (item.getItemId()){
+                    case R.id.dashboard:
+                    case R.id.search:
+                        startActivity(new Intent(getApplicationContext(), SearchActivity.class));
+                        overridePendingTransition(0,0);
+                        return true;
+                    case R.id.map:
+                        startActivity(new Intent(getApplicationContext(), map.class));
+                        overridePendingTransition(0,0);
+                        return true;
+                }
+                return false;
+            }
+        });
+
+
+
+        db = new databaseHandler(this);
+        db.openDatabase();
+        taskList = new ArrayList<>();
+
+        listRecyclerView = findViewById(R.id.listsRecyclerView);
+        listRecyclerView.setLayoutManager(new LinearLayoutManager(this));
+        listsAdapter = new listAdapter(db,this);
+        listRecyclerView.setAdapter(listsAdapter);
+
+        fab = findViewById(R.id.fab);
+        ItemTouchHelper itemTouchHelper = new ItemTouchHelper(new com.example.shoppinglistmaster.itemTouchHelper(listsAdapter));
+        itemTouchHelper.attachToRecyclerView(listRecyclerView);
+        taskList = db.getAllTasks();
+        Collections.reverse(taskList);
+        listsAdapter.setItem(taskList);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
+            public void onClick(View v) {
+                addNewItem.newInstance().show(getSupportFragmentManager(), addNewItem.TAG);
             }
         });
     }
 
     @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.menu_main, menu);
-        return true;
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
-
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-            return true;
-        }
-
-        return super.onOptionsItemSelected(item);
+    public void handleDialogClose(DialogInterface dialog) {
+        taskList = db.getAllTasks();
+        Collections.reverse(taskList);
+        listsAdapter.setItem(taskList);
+        listsAdapter.notifyDataSetChanged();
     }
 }
