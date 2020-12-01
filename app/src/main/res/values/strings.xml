@@ -1,0 +1,4 @@
+<resources>
+    <string name="app_name">Shop Smart</string>
+    <string name="search_hint">Enter Item Name...</string>
+</resources>
